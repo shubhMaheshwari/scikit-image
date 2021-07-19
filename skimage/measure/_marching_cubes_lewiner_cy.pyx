@@ -979,26 +979,29 @@ def marching_cubes(float[:, :, :] im not None, double isovalue,
                 x += st
                 x_st = x + st
                 if no_mask or mask[z_st, y_st, x_st]:
-                    # Initialize cell
-                    cell.set_cube(isovalue, x, y, z, st,
-                        im[z   ,y, x], im[z   ,y, x_st], im[z   ,y_st, x_st], im[z   ,y_st, x],
-                        im[z_st,y, x], im[z_st,y, x_st], im[z_st,y_st, x_st], im[z_st,y_st, x] )
 
-                    # Do classic!
-                    if classic:
-                        # Determine number of vertices
-                        nt = 0
-                        while luts.CASESCLASSIC.get2(cell.index, 3*nt) != -1:
-                            nt += 1
-                        # Add triangles
-                        if nt > 0:
-                            cell.add_triangles(luts.CASESCLASSIC, cell.index, nt)
-                    else:
-                        # Get case, if non-nul, enter the big switch
-                        case = luts.CASES.get2(cell.index, 0)
-                        if case > 0:
-                            config = luts.CASES.get2(cell.index, 1)
-                            the_big_switch(luts, cell, case, config)
+                    if (mask[z   ,y, x] and mask[z   ,y, x_st] and mask[z   ,y_st, x_st] and mask[z   ,y_st, x] and 
+                        mask[z_st,y, x] and mask[z_st,y, x_st] and mask[z_st,y_st, x_st] and mask[z_st,y_st, x]): 
+                        # Initialize cell
+                        cell.set_cube(isovalue, x, y, z, st,
+                            im[z   ,y, x], im[z   ,y, x_st], im[z   ,y_st, x_st], im[z   ,y_st, x],
+                            im[z_st,y, x], im[z_st,y, x_st], im[z_st,y_st, x_st], im[z_st,y_st, x] )
+
+                        # Do classic!
+                        if classic:
+                            # Determine number of vertices
+                            nt = 0
+                            while luts.CASESCLASSIC.get2(cell.index, 3*nt) != -1:
+                                nt += 1
+                            # Add triangles
+                            if nt > 0:
+                                cell.add_triangles(luts.CASESCLASSIC, cell.index, nt)
+                        else:
+                            # Get case, if non-nul, enter the big switch
+                            case = luts.CASES.get2(cell.index, 0)
+                            if case > 0:
+                                config = luts.CASES.get2(cell.index, 1)
+                                the_big_switch(luts, cell, case, config)
 
     # Done
     return cell.get_vertices(), cell.get_faces(), cell.get_normals(), cell.get_values()
